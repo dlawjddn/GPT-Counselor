@@ -22,3 +22,8 @@ logging:
 
 gpt:
   secret: ${GPT_KEY}
+
+papago:
+  client:
+    id: ${CLIENT_ID}
+    pw: ${CLIENT_SECRET}
