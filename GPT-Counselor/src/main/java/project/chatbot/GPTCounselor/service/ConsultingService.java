@@ -13,9 +13,15 @@ import project.chatbot.GPTCounselor.repository.ConsultingRepository;
 public class ConsultingService {
     private final ConsultingRepository consultingRepository;
     private final MemberService memberService;
+    private final ChatService chatService;
     @Transactional
     public void saveConsulting(SaveConsultingDTO saveConsultingDTO){
-        consultingRepository.save(new Consulting(saveConsultingDTO.getTitle(), getMember()));
+        Consulting consulting = consultingRepository.save(new Consulting(saveConsultingDTO.getTitle(), getMember()));
+        chatService.saveChat(consulting, "system", "You are a helpful counselor");
+    }
+    public Consulting findById(Long consultingId){
+        return consultingRepository.findById(consultingId)
+                .orElseThrow(() -> new RuntimeException("doesn't exist consulting"));
     }
     private Member getMember(){
         return memberService.findByUsername("dlawjddn");
