@@ -1,10 +1,10 @@
-package project.chatbot.GPTConselor;
+package project.chatbot.GPTCounselor;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class GptConselorServerApplicationTests {
+class GptCounselorApplicationTests {
 
 	@Test
 	void contextLoads() {

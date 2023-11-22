@@ -1,13 +1,13 @@
-package project.chatbot.GPTConselor;
+package project.chatbot.GPTCounselor;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class GptConselorServerApplication {
+public class GptCounselorApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(GptConselorServerApplication.class, args);
+		SpringApplication.run(GptCounselorApplication.class, args);
 	}
 
 }
