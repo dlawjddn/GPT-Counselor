@@ -1,6 +1,7 @@
 package project.chatbot.GPTCounselor.domain;
 
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -24,4 +25,9 @@ public class Consulting {
     @OneToOne
     @PrimaryKeyJoinColumn
     private Feedback feedBack;
+    @Builder
+    public Consulting(String title, Member member) {
+        this.title = title;
+        this.member = member;
+    }
 }
