@@ -18,16 +18,15 @@ public class Chat {
     @ManyToOne
     @JoinColumn(name = "consulting_id")
     private Consulting consulting;
+    private String role;
     @Column(columnDefinition = "LONGTEXT")
-    private String userMessage;
-    @Column(columnDefinition = "LONGTEXT")
-    private String gptMessage;
+    private String content;
     private LocalDateTime createdAt;
     @Builder
-    public Chat(Consulting consulting, String userMessage, String gptMessage) {
+    public Chat(Consulting consulting, String role, String content) {
         this.consulting = consulting;
-        this.userMessage = userMessage;
-        this.gptMessage = gptMessage;
+        this.role = role;
+        this.content = content;
         this.createdAt = LocalDateTime.now();
     }
 }
