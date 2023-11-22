@@ -20,6 +20,10 @@ public class MemberService {
                         .password(saveMemberDTO.getPassword())
                         .build());
     }
+    public Member findByUsername(String username){
+        return memberRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("doesn't exist member"));
+    }
 
     public CheckDuplicatedIdDTO isDuplicated(String id) {
         return new CheckDuplicatedIdDTO(!memberRepository.existsByUsername(id));
