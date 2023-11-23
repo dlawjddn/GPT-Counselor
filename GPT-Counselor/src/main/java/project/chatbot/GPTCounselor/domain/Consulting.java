@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -29,5 +30,9 @@ public class Consulting {
     public Consulting(String title, Member member) {
         this.title = title;
         this.member = member;
+    }
+    @Transactional
+    public void saveSolution(String solution){
+        this.solution = solution;
     }
 }
