@@ -1,11 +1,12 @@
 package project.chatbot.GPTCounselor.controller;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import project.chatbot.GPTCounselor.dto.member.request.SaveMemberDTO;
 import project.chatbot.GPTCounselor.dto.member.response.CheckDuplicatedIdDTO;
 import project.chatbot.GPTCounselor.service.MemberService;
-
+@Slf4j
 @RestController
 @RequestMapping("/api/v1")
 @RequiredArgsConstructor
@@ -19,5 +20,4 @@ public class MemberController {
     public CheckDuplicatedIdDTO checkDuplicatedId(@RequestParam String id){
         return memberService.isDuplicated(id);
     }
-
 }
