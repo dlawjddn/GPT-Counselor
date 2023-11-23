@@ -15,7 +15,13 @@ public class Feedback {
     @OneToOne
     @PrimaryKeyJoinColumn
     private Consulting consulting;
-    private int score;
-    private String evaluation;
+    private int length;
+    private double satisfied;
+
+    public Feedback(Consulting consulting, int length, double satisfied) {
+        this.consulting = consulting;
+        this.length = length;
+        this.satisfied = satisfied;
+    }
 }
 
