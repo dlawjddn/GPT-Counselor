@@ -6,9 +6,11 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import project.chatbot.GPTCounselor.dto.chat.response.ConsultingChatDTO;
 import project.chatbot.GPTCounselor.dto.consulting.request.SaveConsultingDTO;
+import project.chatbot.GPTCounselor.dto.consulting.request.SaveFeedbackDTO;
 import project.chatbot.GPTCounselor.dto.consulting.response.SaveSolutionDTO;
 import project.chatbot.GPTCounselor.dto.consulting.response.ShowConsultingSimpleDTO;
 import project.chatbot.GPTCounselor.service.ConsultingService;
+import project.chatbot.GPTCounselor.service.FeedBackService;
 
 import java.util.List;
 
@@ -17,6 +19,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ConsultingController {
     private final ConsultingService consultingService;
+    private final FeedBackService feedBackService;
     @PostMapping("/users/consulting")
     public void saveConsulting(@RequestBody SaveConsultingDTO saveConsultingDTO){
         consultingService.saveConsulting(saveConsultingDTO);
@@ -32,5 +35,9 @@ public class ConsultingController {
     @GetMapping("/users/consulting/solution")
     public SaveSolutionDTO makeSolution(@RequestParam Long id) throws JsonProcessingException {
         return consultingService.makeSolution(id);
+    }
+    @PostMapping("/users/feedback")
+    public void saveFeedback(@RequestBody SaveFeedbackDTO saveFeedbackDTO){
+        feedBackService.saveFeedback(saveFeedbackDTO);
     }
 }
