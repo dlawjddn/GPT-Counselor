@@ -13,6 +13,7 @@ import project.chatbot.GPTCounselor.domain.Chat;
 import project.chatbot.GPTCounselor.domain.Consulting;
 import project.chatbot.GPTCounselor.dto.chat.request.SendChatDTO;
 import project.chatbot.GPTCounselor.dto.chat.response.GptChatDTO;
+import project.chatbot.GPTCounselor.dto.consulting.response.SaveSolutionDTO;
 import project.chatbot.GPTCounselor.dto.gpt.request.GptRequest;
 import project.chatbot.GPTCounselor.dto.gpt.request.Message;
 import project.chatbot.GPTCounselor.dto.gpt.response.GptResponse;
@@ -30,6 +31,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -53,7 +55,7 @@ public class ChatService {
                         .content(chat)
                 .build());
     }
-    public GptChatDTO sendMessage(SendChatDTO sendChatDTO) throws JsonProcessingException {
+    public GptChatDTO sendMessage(SendChatDTO sendChatDTO, boolean needSolution) throws JsonProcessingException {
         Consulting consulting = consultingRepository.findById(sendChatDTO.getConsultingId())
                 .orElseThrow(() -> new RuntimeException());
         log.info("컨설팅 조회 성공");
@@ -78,13 +80,13 @@ public class ChatService {
         log.info("gpt json 파싱 완료");
 
         String gptChat = gptResponse.getChoices().get(0).getMessage().getContent();
-        GptChatDTO gptChatDTO = translateChat(gptChat, true);
-        saveChat(consulting, "assistant", gptChatDTO.getGptChat());
+        gptChat= translateChat(gptChat, true);
+        saveChat(consulting, "assistant", gptChat);
         log.info("채팅 저장 완료: " + gptChat);
 
-        return gptChatDTO;
+        return new GptChatDTO(gptChat);
     }
-    public GptChatDTO translateChat(String chat, boolean enToKo) throws JsonProcessingException {
+    public String translateChat(String chat, boolean enToKo) throws JsonProcessingException {
 
 
         String apiURL = "https://openapi.naver.com/v1/papago/n2mt";
@@ -107,7 +109,7 @@ public class ChatService {
         String translatedText = objectMapper.readValue(responseBody, PapagoResponse.class).getMessage().getResult().getTranslatedText();
         log.info("papago json parsing 완료");
 
-        return new GptChatDTO(translatedText);
+        return translatedText;
     }
     private static String post(String apiUrl, Map<String, String> requestHeaders, String text, boolean en){
         HttpURLConnection con = connect(apiUrl);
@@ -175,5 +177,42 @@ public class ChatService {
                 .messages(messages)
                 .temperature(0.5)
                 .build();
+    }
+    public GptRequest makeSolutionRequest(Consulting consulting){
+        List<Message> messages = chatRepository.findAllByConsulting(consulting).stream()
+                .map(chat -> new Message(chat.getRole(), chat.getContent()))
+                .collect(Collectors.toList());
+        messages.add(new Message("user", "너와 나의 채팅을 보고 3줄 정도로 요약하고 솔루션을 제시해줘"));
+        return GptRequest.builder()
+                .messages(messages)
+                .temperature(0.5)
+                .build();
+    }
+    @Transactional
+    public SaveSolutionDTO makeSolution(Consulting consulting) throws JsonProcessingException {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setBearerAuth(gptSecretKey);
+        log.info("gpt 헤더 설정 완료");
+        HttpEntity httpEntity = new HttpEntity(makeSolutionRequest(consulting), headers);
+        log.info("gpt http entity 생성 완료");
+
+        String jsonResponse = restTemplate.exchange(
+                "https://api.openai.com/v1/chat/completions",
+                HttpMethod.POST,
+                httpEntity,
+                String.class
+        ).getBody();
+        log.info("gpt api 응답 완료");
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        GptResponse gptResponse = objectMapper.readValue(jsonResponse, GptResponse.class);
+        log.info("gpt json 파싱 완료");
+
+        String gptChat = gptResponse.getChoices().get(0).getMessage().getContent();
+        String korSolution = translateChat(gptChat, true);
+        consulting.saveSolution(korSolution);
+        consultingRepository.save(consulting);
+        return new SaveSolutionDTO(korSolution);
     }
 }
