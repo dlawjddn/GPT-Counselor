@@ -87,7 +87,7 @@ public class ChatService {
         return new GptChatDTO(gptChat);
     }
     public String translateChat(String chat, boolean enToKo) throws JsonProcessingException {
-
+        log.info("chat = {}", chat);
 
         String apiURL = "https://openapi.naver.com/v1/papago/n2mt";
         try {
@@ -171,7 +171,13 @@ public class ChatService {
     public GptRequest makeRequest(Consulting consulting, String userChat){
         saveChat(consulting, "user", userChat);
         List<Message> messages = chatRepository.findAllByConsulting(consulting).stream()
-                .map(chat -> new Message(chat.getRole(), chat.getContent()))
+                .map(chat -> {
+                    try {
+                        return new Message(chat.getRole(), translateChat(userChat, false));
+                    } catch (JsonProcessingException e) {
+                        throw new RuntimeException(e);
+                    }
+                })
                 .toList();
         return GptRequest.builder()
                 .messages(messages)
