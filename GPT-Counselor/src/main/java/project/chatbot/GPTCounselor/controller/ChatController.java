@@ -17,6 +17,6 @@ public class ChatController {
     private final ChatService chatService;
     @PostMapping("/consulting/chat")
     public GptChatDTO sendMessage(@RequestBody SendChatDTO sendChatDTO) throws JsonProcessingException {
-        return chatService.sendMessage(sendChatDTO);
+        return chatService.sendMessage(sendChatDTO, false);
     }
 }
