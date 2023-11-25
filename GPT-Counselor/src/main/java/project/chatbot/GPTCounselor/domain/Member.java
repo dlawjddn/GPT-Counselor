@@ -20,9 +20,11 @@ public class Member {
     private String password;
     @OneToMany(mappedBy = "member")
     private List<Consulting> consultings = new ArrayList<>();
+    private String role;
     @Builder
     public Member(String username, String password){
         this.username = username;
         this.password = password;
+        this.role = "USER";
     }
 }
